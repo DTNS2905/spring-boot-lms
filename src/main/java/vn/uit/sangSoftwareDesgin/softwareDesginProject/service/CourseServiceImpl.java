@@ -1,0 +1,65 @@
+package vn.uit.sangSoftwareDesgin.softwareDesginProject.service;
+
+import org.modelmapper.ModelMapper;
+import org.springframework.beans.factory.annotation.Autowired;
+import vn.uit.sangSoftwareDesgin.softwareDesginProject.DTO.CourseDTO;
+import vn.uit.sangSoftwareDesgin.softwareDesginProject.model.Course;
+import vn.uit.sangSoftwareDesgin.softwareDesginProject.repo.CourseRepo;
+
+import java.util.List;
+import java.util.stream.Collectors;
+
+public class CourseServiceImpl implements CourseService{
+    @Autowired
+    private CourseRepo courseRepository;
+
+    @Autowired
+    private ModelMapper modelMapper;
+
+    @Override
+    public List<CourseDTO> getAllCourses() {
+        List<Course> courses = courseRepository.findAll();
+        return courses.stream()
+                .map(course -> modelMapper.map(course, CourseDTO.class))
+                .collect(Collectors.toList());
+    }
+
+    @Override
+    public CourseDTO getCourseById(Long id) {
+        Course course = courseRepository.findById(id)
+                .orElseThrow(() -> new IllegalArgumentException("Course not found with id: " + id));
+        return modelMapper.map(course, CourseDTO.class);
+    }
+
+    @Override
+    public CourseDTO createCourse(CourseDTO courseDTO) {
+        Course course = modelMapper.map(courseDTO, Course.class);
+        Course savedCourse = courseRepository.save(course);
+        return modelMapper.map(savedCourse, CourseDTO.class);
+    }
+
+    @Override
+    public CourseDTO updateCourse(Long id, CourseDTO courseDTO) {
+        Course existingCourse = courseRepository.findById(id)
+                .orElseThrow(() -> new IllegalArgumentException("Course not found with id: " + id));
+
+        // Update fields
+        existingCourse.setCourseName(courseDTO.getCourseName());
+        existingCourse.setTitle(courseDTO.getTitle());
+        existingCourse.setDescription(courseDTO.getDescription());
+        existingCourse.setBeginDate(courseDTO.getBeginDate());
+        existingCourse.setEndDate(courseDTO.getEndDate());
+        existingCourse.setPrice(courseDTO.getPrice());
+
+        Course updatedCourse = courseRepository.save(existingCourse);
+        return modelMapper.map(updatedCourse, CourseDTO.class);
+    }
+
+    @Override
+    public void deleteCourse(Long id) {
+        if (!courseRepository.existsById(id)) {
+            throw new IllegalArgumentException("Course not found with id: " + id);
+        }
+        courseRepository.deleteById(id);
+    }
+}
