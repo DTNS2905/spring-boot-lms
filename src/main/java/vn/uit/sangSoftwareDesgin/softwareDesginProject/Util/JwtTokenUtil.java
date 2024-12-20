@@ -60,6 +60,7 @@ public class JwtTokenUtil {
 
     // Create a JWT token with specified claims, subject (username), and validity duration
     private String createToken(Map<String, Object> claims, String userName, long validitySeconds) {
+        log.warn("setExpiration for token: {}", validitySeconds);
         claims.put("tokenType", validitySeconds == ACCESS_TOKEN_VALIDITY_SECONDS ? TokenType.ACCESS.name() : TokenType.REFRESH.name());
         return Jwts.builder()
                 .setClaims(claims)
