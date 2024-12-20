@@ -24,6 +24,12 @@ import vn.uit.sangSoftwareDesgin.softwareDesginProject.Service.AuthService;
 @EnableWebSecurity(debug = true)
 @EnableMethodSecurity
 public class SecurityConfig {
+    public static final String[] WHITE_LIST_URL = {
+            "api/auth/**",
+            "api/auth/refresh"
+
+    };
+
 
     @Lazy
     @Autowired
@@ -40,12 +46,12 @@ public class SecurityConfig {
         http
             .csrf(csrf -> {
                 csrf.ignoringRequestMatchers(
-                        "api/auth/welcome", "api/auth/register", "api/auth/login"
+                        WHITE_LIST_URL
                 );
             })
             .authorizeHttpRequests(auth -> auth
 //                .dispatcherTypeMatchers(FORWARD, ERROR).permitAll()
-                .requestMatchers("api/auth/welcome", "api/auth/register", "api/auth/login").permitAll()
+                .requestMatchers(WHITE_LIST_URL).permitAll()
                 .requestMatchers("/auth/user/**").hasAuthority("ROLE_USER")
                 .requestMatchers("/auth/admin/**").hasAuthority("ROLE_ADMIN")
                 .anyRequest().authenticated() // Protect all other endpoints

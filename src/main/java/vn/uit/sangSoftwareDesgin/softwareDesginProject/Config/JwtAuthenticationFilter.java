@@ -13,6 +13,7 @@ import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
+import vn.uit.sangSoftwareDesgin.softwareDesginProject.Entity.Enums.TokenType;
 import vn.uit.sangSoftwareDesgin.softwareDesginProject.Service.AuthService;
 import vn.uit.sangSoftwareDesgin.softwareDesginProject.Util.JwtTokenUtil;
 import lombok.RequiredArgsConstructor;
@@ -70,7 +71,8 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
         if (username != null) {
             UserDetails userDetails = authService.loadUserByUsername(username);
 
-            if (jwtTokenUtil.validateToken(token, userDetails)) {
+            // Validate access token
+            if (jwtTokenUtil.validateToken(token, userDetails, TokenType.ACCESS)) {
                 UsernamePasswordAuthenticationToken authToken = new UsernamePasswordAuthenticationToken(
                         userDetails,
                         null,
@@ -81,7 +83,7 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
 
                 log.info("Successfully authenticated user: {}", username);
             } else {
-                log.warn("Invalid JWT token for user: {}", username);
+                log.warn("Invalid or expired access token for user: {}", username);
             }
         } else {
             log.warn("Username extraction from token failed.");

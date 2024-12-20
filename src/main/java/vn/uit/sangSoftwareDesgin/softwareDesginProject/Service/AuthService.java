@@ -52,7 +52,8 @@ public class AuthService implements UserDetailsService {
 
 
             if (!ValidationUtils.isValidName(username)) {
-                throw new IllegalArgumentException("Invalid username: must be between 2 and 50 characters, and contain only letters and spaces.");
+                throw new IllegalArgumentException("Invalid username: must be between 2 and 50 characters, " +
+                        "and contain only letters and spaces.");
             }
 
             // Map DTO to Entity
@@ -82,6 +83,4 @@ public class AuthService implements UserDetailsService {
             throw e;
         }
     }
-
-
 }
