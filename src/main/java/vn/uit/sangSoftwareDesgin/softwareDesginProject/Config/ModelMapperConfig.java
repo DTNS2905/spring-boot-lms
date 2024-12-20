@@ -1,4 +1,4 @@
-package vn.uit.sangSoftwareDesgin.softwareDesginProject.config;
+package vn.uit.sangSoftwareDesgin.softwareDesginProject.Config;
 
 import org.modelmapper.ModelMapper;
 import org.modelmapper.convention.MatchingStrategies;

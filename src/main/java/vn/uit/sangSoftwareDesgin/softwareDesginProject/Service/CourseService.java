@@ -1,4 +1,4 @@
-package vn.uit.sangSoftwareDesgin.softwareDesginProject.service;
+package vn.uit.sangSoftwareDesgin.softwareDesginProject.Service;
 
 import vn.uit.sangSoftwareDesgin.softwareDesginProject.DTO.CourseDTO;
 

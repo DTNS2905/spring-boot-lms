@@ -1,14 +1,14 @@
-package vn.uit.sangSoftwareDesgin.softwareDesginProject.service;
+package vn.uit.sangSoftwareDesgin.softwareDesginProject.Service;
 
 import vn.uit.sangSoftwareDesgin.softwareDesginProject.DTO.UserDTO;
 import vn.uit.sangSoftwareDesgin.softwareDesginProject.ExceptionHandler.UserNotFoundException;
-import vn.uit.sangSoftwareDesgin.softwareDesginProject.model.Course;
-import vn.uit.sangSoftwareDesgin.softwareDesginProject.model.User;
+import vn.uit.sangSoftwareDesgin.softwareDesginProject.Entity.Course;
+import vn.uit.sangSoftwareDesgin.softwareDesginProject.Entity.User;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-import vn.uit.sangSoftwareDesgin.softwareDesginProject.repo.CourseRepo;
-import vn.uit.sangSoftwareDesgin.softwareDesginProject.repo.UserRepo;
+import vn.uit.sangSoftwareDesgin.softwareDesginProject.Repo.CourseRepo;
+import vn.uit.sangSoftwareDesgin.softwareDesginProject.Repo.UserRepo;
 
 import java.util.HashSet;
 import java.util.List;

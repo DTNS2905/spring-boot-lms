@@ -8,14 +8,12 @@ import java.util.Set;
 @Setter
 @Getter
 public class UserDTO {
-    // Getters and Setters
-    private Long id;
-
+    private String username;
     private String fullname;
     private String email;
     private String description;
 
-    private Set<Long> courseIds; // Only course IDs for simplicity
+//    private Set<Long> courseIds; // Only course IDs for simplicity
 
 }
 

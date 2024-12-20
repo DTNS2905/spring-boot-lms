@@ -1,6 +1,6 @@
-package vn.uit.sangSoftwareDesgin.softwareDesginProject.repo;
+package vn.uit.sangSoftwareDesgin.softwareDesginProject.Repo;
 
-import vn.uit.sangSoftwareDesgin.softwareDesginProject.model.Course;
+import vn.uit.sangSoftwareDesgin.softwareDesginProject.Entity.Course;
 import org.springframework.data.jpa.repository.JpaRepository;
 
 public interface CourseRepo extends JpaRepository<Course, Long> {

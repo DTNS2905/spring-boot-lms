@@ -1,14 +1,16 @@
-package vn.uit.sangSoftwareDesgin.softwareDesginProject.service;
+package vn.uit.sangSoftwareDesgin.softwareDesginProject.Service;
 
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
 import vn.uit.sangSoftwareDesgin.softwareDesginProject.DTO.CourseDTO;
-import vn.uit.sangSoftwareDesgin.softwareDesginProject.model.Course;
-import vn.uit.sangSoftwareDesgin.softwareDesginProject.repo.CourseRepo;
+import vn.uit.sangSoftwareDesgin.softwareDesginProject.Entity.Course;
+import vn.uit.sangSoftwareDesgin.softwareDesginProject.Repo.CourseRepo;
 
 import java.util.List;
 import java.util.stream.Collectors;
 
+@Service
 public class CourseServiceImpl implements CourseService{
     @Autowired
     private CourseRepo courseRepository;

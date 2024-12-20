@@ -1,4 +1,4 @@
-package vn.uit.sangSoftwareDesgin.softwareDesginProject.service;
+package vn.uit.sangSoftwareDesgin.softwareDesginProject.Service;
 
 import vn.uit.sangSoftwareDesgin.softwareDesginProject.DTO.UserDTO;
 
@@ -28,4 +28,8 @@ public interface UserService {
      * @return the updated UserDTO with assigned courses
      */
     UserDTO assignCoursesToUser(Long userId, List<Long> courseIds);
+
+
+
+
 }
