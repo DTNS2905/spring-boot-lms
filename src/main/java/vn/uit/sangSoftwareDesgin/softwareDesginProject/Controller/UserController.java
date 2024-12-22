@@ -3,11 +3,15 @@ package vn.uit.sangSoftwareDesgin.softwareDesginProject.Controller;
 
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.data.domain.Page;
+import org.springframework.security.access.prepost.PreAuthorize;
 import vn.uit.sangSoftwareDesgin.softwareDesginProject.DTO.UserDTO;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 import vn.uit.sangSoftwareDesgin.softwareDesginProject.ResponseInstance.ApiResponse;
 import vn.uit.sangSoftwareDesgin.softwareDesginProject.Service.UserService;
+
+
 
 import java.util.List;
 
@@ -19,25 +23,30 @@ public class UserController {
     private UserService userService;
 
     @GetMapping("/get-all-users")
-    public ResponseEntity<ApiResponse<List<UserDTO>>> getAllUsers() {
-        List<UserDTO> users = userService.getAllUsers();
-        ApiResponse<List<UserDTO>> response = new ApiResponse<>("success", "Users retrieved successfully", users);
-        return new ResponseEntity<>(response, HttpStatus.OK);
+    public ResponseEntity<ApiResponse<Page<UserDTO>>> getAllUsers(
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "10") int size) {
+
+        Page<UserDTO> userPage = userService.getAllUsers(page, size);
+
+        ApiResponse.Pagination pagination = new ApiResponse.Pagination(
+                userPage.getNumber(),
+                userPage.getSize(),
+                userPage.getTotalElements(),
+                userPage.getTotalPages(),
+                userPage.isLast()
+        );
+
+        ApiResponse<Page<UserDTO>> response = new ApiResponse<>(
+                "success",
+                "Users retrieved successfully",
+                userPage,
+                pagination
+        );
+
+        return ResponseEntity.ok(response);
     }
 
-    @PostMapping("/register")
-    public ResponseEntity<ApiResponse<UserDTO>> register(@RequestBody UserDTO userDTO) {
-        UserDTO createdUser = userService.createUser(userDTO);
-        ApiResponse<UserDTO> response = new ApiResponse<>("success", "User created successfully", createdUser);
-        return new ResponseEntity<>(response, HttpStatus.CREATED);
-    }
-
-    @PostMapping("/login")
-    public ResponseEntity<ApiResponse<UserDTO>> login(@RequestBody UserDTO userDTO) {
-        UserDTO createdUser = userService.createUser(userDTO);
-        ApiResponse<UserDTO> response = new ApiResponse<>("success", "User created successfully", createdUser);
-        return new ResponseEntity<>(response, HttpStatus.CREATED);
-    }
 
     @PostMapping("/{userId}/assign-courses")
     public ResponseEntity<ApiResponse<UserDTO>> assignCoursesToUser(

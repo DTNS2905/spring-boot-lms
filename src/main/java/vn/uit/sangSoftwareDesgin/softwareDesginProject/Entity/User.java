@@ -30,11 +30,8 @@ public class User {
     private Long id;
 
     @Column(name = "username",unique = true,nullable = false)
-    @Pattern(
-            regexp = "^[a-zA-Z0-9_]{3,20}$",
-            message = "Invalid username format"
-    )
     private String username;
+
 
     private String email;
 
@@ -42,8 +39,8 @@ public class User {
     @Column(name = "password",nullable = false)
     private String password;
 
-    @DateTimeFormat(pattern = "MM-dd-yyyy")
-    @JsonFormat(pattern = "MM-dd-yyyy")
+    @DateTimeFormat(pattern = "MM-dd-yyyy HH:mm:ss")
+    @JsonFormat(pattern = "MM-dd-yyyy HH:mm:ss")
     @CreationTimestamp
     @Temporal(TemporalType.TIMESTAMP)
     @Column(name = "createdDate",nullable = false, updatable = false)
@@ -66,4 +63,8 @@ public class User {
     @OneToOne(cascade = CascadeType.ALL)
     @JoinColumn(name = "profile_id", referencedColumnName = "id")
     private Profile profile;
+
+    @OneToOne(cascade = CascadeType.ALL)
+    @JoinColumn(name = "cart_id", referencedColumnName = "id")
+    private Cart cart;
 }

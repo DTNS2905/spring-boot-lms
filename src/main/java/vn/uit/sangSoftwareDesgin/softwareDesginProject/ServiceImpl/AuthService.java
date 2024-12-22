@@ -1,9 +1,12 @@
-package vn.uit.sangSoftwareDesgin.softwareDesginProject.Service;
+package vn.uit.sangSoftwareDesgin.softwareDesginProject.ServiceImpl;
 
 import lombok.extern.slf4j.Slf4j;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.DataIntegrityViolationException;
+import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.Authentication;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
@@ -32,6 +35,9 @@ public class AuthService implements UserDetailsService {
     @Autowired
     private ModelMapper modelMapper;
 
+    @Autowired
+    private AuthenticationManager authenticationManager;
+
 
     @Override
     public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
@@ -46,21 +52,26 @@ public class AuthService implements UserDetailsService {
         try {
             String username = userInfo.getUsername();
             String password = userInfo.getPassword();
+            String email = userInfo.getEmail();
             // Log received user info
             log.info("Adding new user with username: {}", username);
             log.info("Adding new user with password: {}", password);
 
 
             if (!ValidationUtils.isValidName(username)) {
-                throw new IllegalArgumentException("Invalid username: must be between 2 and 50 characters, " +
-                        "and contain only letters and spaces.");
+                throw new IllegalArgumentException("Username must have string length is between 3 and 20 characters, inclusive and single " +
+                        "and quote ('), double quote (\"), semicolon (;) are not allowed");
             }
 
             // Map DTO to Entity
             User user = modelMapper.map(userInfo, User.class);
             if(!ValidationUtils.isValidPassword(password)) {
-                throw new IllegalArgumentException("Invalid password: must be at least 8 characters long and include " +
-                        "an uppercase letter, lowercase letter, digit, and special character.");
+                throw new IllegalArgumentException("Password must have 8 to 32 characters long and contain at least one uppercase letter" +
+                        ", one lowercase letter, one digit, one special character from the set @$!%*?&");
+            }
+
+            if(!ValidationUtils.isValidEmail(email)) {
+                throw new IllegalArgumentException("Wrong email format");
             }
 
             user.setPassword(encoder.encode(user.getPassword()));
@@ -83,4 +94,17 @@ public class AuthService implements UserDetailsService {
             throw e;
         }
     }
+
+    public Authentication authenticateUser(String username, String password) {
+        try {
+            log.info("Authenticating user: {}", username);
+            return authenticationManager.authenticate(
+                    new UsernamePasswordAuthenticationToken(username, password)
+            );
+        } catch (Exception e) {
+            log.error("Authentication failed for user: {}", username, e);
+            throw new IllegalStateException("Authentication failed. Please check your credentials.");
+        }
+    }
+
 }

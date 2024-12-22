@@ -19,13 +19,13 @@ public class Profile {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
-    @Column(name = "firstName",nullable = false)
+    @Column(name = "first_name",nullable = false)
     @Pattern(
             regexp = "^[a-zA-Z0-9_]{3,20}$",
             message = "Invalid username format"
     )
     private String firstName;
-    @Column(name = "lastName",nullable = false)
+    @Column(name = "last_name",nullable = false)
     @Pattern(
             regexp = "^[a-zA-Z0-9_]{3,20}$",
             message = "Invalid username format"
@@ -38,7 +38,9 @@ public class Profile {
             message = "Invalid mobile number"
     )
     private String phone;
+
     private String address;
+
     private String description;
 
     @OneToOne(mappedBy = "profile")

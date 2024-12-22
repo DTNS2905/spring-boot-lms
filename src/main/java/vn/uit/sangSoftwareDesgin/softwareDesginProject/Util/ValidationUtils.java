@@ -6,9 +6,15 @@ public class ValidationUtils {
 
     // Regex patterns for various validations
     private static final String PASSWORD_PATTERN =
-            "^(?=.*[a-z])(?=.*[A-Z])(?=.*\\d)(?=.*[@$!%*?&])[A-Za-z\\d@$!%*?&]{8,}$";
+            "^(?!.*['\";])(?=.*[a-z])(?=.*[A-Z])(?=.*\\d)(?=.*[@$!%*?&])[A-Za-z\\d@$!%*?&]{8,32}$";
     private static final String NAME_PATTERN =
-            "^[a-zA-Z ]{2,50}$"; // Allow letters and spaces, between 2 and 50 characters
+            "^(?!.*['\";])[a-zA-Z0-9_.@-]{3,20}$";
+    private static final String INPUT_PATTERN =
+            "^(?!.*['\";])[\\w\\s]{8,32}$";
+    private static final String EMAIL_PATTERN =
+            "^(?!.*['\";])[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\\.[a-zA-Z]{2,}$";
+
+
 
     /**
      * Validates if the given password meets the complexity requirements.
@@ -34,10 +40,19 @@ public class ValidationUtils {
      * Generic method to validate an input string with a custom regex pattern.
      *
      * @param input   The input string to validate.
-     * @param pattern The regex pattern to validate against.
      * @return true if valid, false otherwise.
      */
-    public static boolean isValidInput(String input, String pattern) {
-        return Pattern.matches(pattern, input);
+    public static boolean isValidInput(String input) {
+        return Pattern.matches(INPUT_PATTERN, input);
+    }
+
+    /**
+     * Generic method to validate an input string with a custom regex pattern.
+     *
+     * @param email The email to validate.
+     * @return true if valid, false otherwise.
+     */
+    public static boolean isValidEmail(String email) {
+        return Pattern.matches(EMAIL_PATTERN, email);
     }
 }
