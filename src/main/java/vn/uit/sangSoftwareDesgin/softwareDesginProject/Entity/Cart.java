@@ -26,14 +26,19 @@ public class Cart {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-
-
     @DateTimeFormat(pattern = "MM-dd-yyyy HH:mm:ss")
     @JsonFormat(pattern = "MM-dd-yyyy HH:mm:ss")
     @CreationTimestamp
     @Temporal(TemporalType.TIMESTAMP)
     @Column(name = "created_at", nullable = false)
     private Date createdAt;
+
+    @DateTimeFormat(pattern = "MM-dd-yyyy HH:mm:ss")
+    @JsonFormat(pattern = "MM-dd-yyyy HH:mm:ss")
+    @CreationTimestamp
+    @Temporal(TemporalType.TIMESTAMP)
+    @Column(name = "updated_at", nullable = false)
+    private Date UpdateAt;
 
     @OneToOne(mappedBy = "cart")
     private User user;

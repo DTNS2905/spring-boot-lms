@@ -1,8 +1,9 @@
-package vn.uit.sangSoftwareDesgin.softwareDesginProject.ServiceImpl;
+package vn.uit.sangSoftwareDesgin.softwareDesginProject.Security;
 
 import lombok.extern.slf4j.Slf4j;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.Lazy;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
@@ -16,7 +17,6 @@ import vn.uit.sangSoftwareDesgin.softwareDesginProject.DTO.RegisterRequestDTO;
 import vn.uit.sangSoftwareDesgin.softwareDesginProject.Entity.Enums.Role;
 import vn.uit.sangSoftwareDesgin.softwareDesginProject.Entity.User;
 import vn.uit.sangSoftwareDesgin.softwareDesginProject.Repo.UserRepo;
-import vn.uit.sangSoftwareDesgin.softwareDesginProject.Security.UserInfoDetails;
 import vn.uit.sangSoftwareDesgin.softwareDesginProject.Util.ValidationUtils;
 
 import java.util.List;
@@ -29,12 +29,14 @@ public class AuthService implements UserDetailsService {
     @Autowired
     private UserRepo userRepo;
 
+    @Lazy
     @Autowired
     private PasswordEncoder encoder;
 
     @Autowired
     private ModelMapper modelMapper;
 
+    @Lazy
     @Autowired
     private AuthenticationManager authenticationManager;
 

@@ -6,8 +6,6 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.authentication.AuthenticationManager;
-import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
@@ -15,7 +13,7 @@ import org.springframework.web.bind.annotation.*;
 import vn.uit.sangSoftwareDesgin.softwareDesginProject.DTO.*;
 import vn.uit.sangSoftwareDesgin.softwareDesginProject.Entity.Enums.TokenType;
 import vn.uit.sangSoftwareDesgin.softwareDesginProject.ResponseInstance.ApiResponse;
-import vn.uit.sangSoftwareDesgin.softwareDesginProject.ServiceImpl.AuthService;
+import vn.uit.sangSoftwareDesgin.softwareDesginProject.Security.AuthService;
 import vn.uit.sangSoftwareDesgin.softwareDesginProject.Util.JwtTokenUtil;
 
 @RestController
@@ -23,6 +21,7 @@ import vn.uit.sangSoftwareDesgin.softwareDesginProject.Util.JwtTokenUtil;
 public class AuthController {
 
     private static final Logger log = LoggerFactory.getLogger(AuthController.class);
+
     @Autowired
     private AuthService service;
 
@@ -42,7 +41,7 @@ public class AuthController {
             if (savedUser == null) {
                 log.warn("User creation failed: savedUser is null.");
                 return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(
-                        new ApiResponse<>("error", "Failed to create user. Please try again later.", null)
+                        ApiResponse.error("Failed to create user. Please try again later.")
                 );
             }
             log.info("User created successfully with username: {}", savedUser.getUsername());
@@ -52,7 +51,7 @@ public class AuthController {
             if (!authentication.isAuthenticated()) {
                 log.error("Authentication failed for username: {}", userInfo.getUsername());
                 return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(
-                        new ApiResponse<>("error", "Authentication failed. Please try again later.", null)
+                        ApiResponse.error("Authentication failed. Please try again later.")
                 );
             }
 
@@ -62,20 +61,22 @@ public class AuthController {
 
             // Prepare response
             TokenResponseDTO tokenResponse = new TokenResponseDTO(accessToken, refreshToken);
-            ApiResponse<TokenResponseDTO> response = new ApiResponse<>("success", "User registered successfully.", tokenResponse);
+            ApiResponse<TokenResponseDTO> response = ApiResponse.success(
+                    "User registered successfully.", tokenResponse
+            );
 
             return ResponseEntity.ok(response);
 
         } catch (IllegalArgumentException e) {
             log.error("User registration error: {}", e.getMessage());
             return ResponseEntity.status(HttpStatus.CONFLICT).body(
-                    new ApiResponse<>("error", e.getMessage(), null)
+                    ApiResponse.error(e.getMessage())
             );
 
         } catch (Exception e) {
             log.error("Unexpected error during user registration: {}", e.getMessage());
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(
-                    new ApiResponse<>("error", "An unexpected error occurred. Please try again later.", null)
+                    ApiResponse.error("An unexpected error occurred. Please try again later.")
             );
         }
     }
@@ -111,8 +112,7 @@ public class AuthController {
                 TokenResponseDTO responseDTO = new TokenResponseDTO(accessToken,refreshToken);
 
                 // Wrap in ApiResponse
-                ApiResponse<TokenResponseDTO> response = new ApiResponse<>(
-                        "success",
+                ApiResponse<TokenResponseDTO> response = ApiResponse.success(
                         "Login successful",
                         responseDTO
                 );
@@ -124,20 +124,16 @@ public class AuthController {
 
         } catch (UsernameNotFoundException e) {
             // Handle invalid user requests
-            ApiResponse<TokenResponseDTO> response = new ApiResponse<>(
-                    "error",
-                    e.getMessage(),
-                    null
+            ApiResponse<TokenResponseDTO> response = ApiResponse.error(
+                    e.getMessage()
             );
             log.error(String.valueOf(e));
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(response);
 
         } catch (Exception e) {
             // Handle unexpected errors
-            ApiResponse<TokenResponseDTO> response = new ApiResponse<>(
-                    "error",
-                    "An unexpected error occurred",
-                    null
+            ApiResponse<TokenResponseDTO> response = ApiResponse.error(
+                    "An unexpected error occurred"
             );
             log.error("An unexpected error occurred", e);
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(response);
@@ -153,10 +149,8 @@ public class AuthController {
 
             // Validate the refresh token
             if (!jwtTokenUtil.validateToken(refreshToken, null, TokenType.REFRESH)) {
-                ApiResponse<RefreshResponseDTO> response = new ApiResponse<>(
-                        "error",
-                        "Invalid refresh token",
-                        null
+                ApiResponse<RefreshResponseDTO> response = ApiResponse.error(
+                        "Invalid refresh token"
                 );
                 log.error("Invalid refresh token received");
                 return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(response);
@@ -175,19 +169,15 @@ public class AuthController {
             RefreshResponseDTO responseDTO = new RefreshResponseDTO(newAccessToken);
 
             // Return the new access token
-            ApiResponse<RefreshResponseDTO> responseSuccess = new ApiResponse<>(
-                    "success",
-                    "Access token refreshed successfully",
-                    responseDTO
+            ApiResponse<RefreshResponseDTO> responseSuccess = ApiResponse.success(
+                    "Access token refreshed successfully", responseDTO
             );
             return ResponseEntity.ok(responseSuccess);
 
         } catch (Exception e) {
             // Handle unexpected errors
-            ApiResponse<RefreshResponseDTO> response = new ApiResponse<>(
-                    "error",
-                    "An unexpected error occurred",
-                    null
+            ApiResponse<RefreshResponseDTO> response = ApiResponse.error(
+                    "An unexpected error occurred"
             );
             log.error("Error while refreshing access token: {}", e.getMessage());
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(response);

@@ -1,6 +1,8 @@
 package vn.uit.sangSoftwareDesgin.softwareDesginProject.ServiceImpl;
 
 import org.modelmapper.ModelMapper;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import vn.uit.sangSoftwareDesgin.softwareDesginProject.DTO.ProfileCreateDTO;
@@ -16,6 +18,7 @@ import java.util.Optional;
 @Service
 public class ProfileServiceImpl implements ProfileService {
 
+    private static final Logger log = LoggerFactory.getLogger(ProfileServiceImpl.class);
     @Autowired
     private ProfileRepo profileRepository;
 
@@ -25,38 +28,74 @@ public class ProfileServiceImpl implements ProfileService {
     @Autowired
     private ModelMapper modelMapper;
 
+    @Autowired
+    private ProfileTransactionService profileTransactionService;
 
-    public Profile createProfile(Long userId, ProfileCreateDTO profileCreateDTO) {
-        Optional<User> userOptional = userRepository.findById(userId);
-        if (userOptional.isEmpty()) {
-            throw new IllegalArgumentException("User not found.");
+
+    @Override
+    public Profile getProfile(String username) {
+        try{
+            Optional<User> foundUser = userRepository.findByUsername(username);
+            if (foundUser.isEmpty()) {
+                throw new IllegalArgumentException("Profile Not Found.");
+            }
+
+            User user = foundUser.get();
+            Profile profile = user.getProfile();
+
+            if (profile != null) {
+                return modelMapper.map(profile, Profile.class);
+            }
+
+            return null;
+        } catch(Exception e) {
+            log.error("error while fetching profile {}",e.getMessage(), e);
+            return null;
         }
 
-        User user = userOptional.get();
+    }
+
+    @Override
+    public Profile createProfile(String username, ProfileCreateDTO profileCreateDTO) {
+        // Check if user exists
+        User user = userRepository.findByUsername(username)
+                .orElseThrow(() -> new IllegalArgumentException("User not found with username: " + username));
 
         // Check if the user already has a profile
         if (user.getProfile() != null) {
-            throw new IllegalArgumentException("User already has a profile. Update the existing profile instead.");
+            throw new IllegalArgumentException("Profile already exists for the user.");
         }
 
         // Map DTO to Profile entity
         Profile profile = modelMapper.map(profileCreateDTO, Profile.class);
-        profile.setUser(user); // Associate profile with the user
 
-        return profileRepository.save(profile);
+        // Save profile using transaction service
+        profileTransactionService.saveProfile(user, profile);
+
+        return profile;
     }
 
-    public Profile updateProfile(Long id, ProfileUpdateDTO profileUpdateDTO) {
-        Optional<Profile> existingProfile = profileRepository.findById(id);
-        if (existingProfile.isEmpty()) {
-            throw new IllegalArgumentException("Profile not found. Create a profile first.");
+    @Override
+    public Profile updateProfile(String username, ProfileUpdateDTO profileUpdateDTO) {
+        try {
+            // Fetch user by username
+            User user = userRepository.findByUsername(username)
+                    .orElseThrow(() -> new IllegalArgumentException("User not found with username: " + username));
+
+            // Ensure the user has an existing profile
+            if (user.getProfile() == null) {
+                throw new IllegalArgumentException("Profile not found. Create a profile first.");
+            }
+
+            // Get the existing profile
+            Profile updateProfile = modelMapper.map(profileUpdateDTO, Profile.class);
+
+            // Save and return the updated profile
+            return profileTransactionService.saveProfile(user, updateProfile);
+
+        } catch (Exception e) {
+            log.error("Error while updating profile {}", e.getMessage(), e);
+            throw e; // Propagate the exception for handling upstream (optional)
         }
-
-        Profile profile = existingProfile.get();
-        modelMapper.map(profileUpdateDTO, profile); // Map updated fields to existing entity
-
-        return profileRepository.save(profile);
     }
-
-//    public Profile
 }

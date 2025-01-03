@@ -17,7 +17,7 @@ public class ImageController {
     private ImageService imageService;
 
     @Autowired
-    private LogService logService;
+    private  LogService logService;
 
     @PostMapping("/upload")
     public ResponseEntity<Map<String, String>> uploadImage(@ModelAttribute ImageDTO imageModel) {

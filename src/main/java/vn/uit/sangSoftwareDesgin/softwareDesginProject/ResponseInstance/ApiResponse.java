@@ -11,6 +11,7 @@ public class ApiResponse<T> {
     private T data;
     private Pagination pagination; // Nullable by default
 
+    // Constructor with pagination
     public ApiResponse(String status, String message, T data, Pagination pagination) {
         this.status = status;
         this.message = message;
@@ -18,8 +19,27 @@ public class ApiResponse<T> {
         this.pagination = pagination;
     }
 
+    // Constructor without pagination
     public ApiResponse(String status, String message, T data) {
         this(status, message, data, null); // No pagination by default
+    }
+
+    // Static method for success response
+    public static <T> ApiResponse<T> success(String message, T data) {
+        return new ApiResponse<>("success", message, data);
+    }
+
+    public static <T> ApiResponse<T> success(String message, T data, Pagination pagination) {
+        return new ApiResponse<>("success", message, data, pagination);
+    }
+
+    // Static  method for error response
+    public static <T> ApiResponse<T> error(String message, T data) {
+        return new ApiResponse<>("error", message, data);
+    }
+
+    public static <T> ApiResponse<T> error(String message) {
+        return new ApiResponse<>("error", message, null);
     }
 
     @Getter

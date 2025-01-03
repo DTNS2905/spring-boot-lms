@@ -1,8 +1,15 @@
 package vn.uit.sangSoftwareDesgin.softwareDesginProject.Util;
 
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.Authentication;
+
 import java.util.regex.Pattern;
 
 public class ValidationUtils {
+
+
 
     // Regex patterns for various validations
     private static final String PASSWORD_PATTERN =
@@ -55,4 +62,6 @@ public class ValidationUtils {
     public static boolean isValidEmail(String email) {
         return Pattern.matches(EMAIL_PATTERN, email);
     }
+
+
 }

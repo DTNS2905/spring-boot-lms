@@ -1,7 +1,5 @@
 package vn.uit.sangSoftwareDesgin.softwareDesginProject.Config;
 
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.context.annotation.Lazy;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -13,25 +11,29 @@ import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
+import vn.uit.sangSoftwareDesgin.softwareDesginProject.DTO.UserDTO;
+import vn.uit.sangSoftwareDesgin.softwareDesginProject.Entity.Enums.Role;
 import vn.uit.sangSoftwareDesgin.softwareDesginProject.Entity.Enums.TokenType;
-import vn.uit.sangSoftwareDesgin.softwareDesginProject.ServiceImpl.AuthService;
+import vn.uit.sangSoftwareDesgin.softwareDesginProject.Entity.User;
+import vn.uit.sangSoftwareDesgin.softwareDesginProject.Security.AuthService;
 import vn.uit.sangSoftwareDesgin.softwareDesginProject.Util.JwtTokenUtil;
-import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
 import java.io.IOException;
+import java.util.List;
 
 @Slf4j
 @Component
-@RequiredArgsConstructor
 public class JwtAuthenticationFilter extends OncePerRequestFilter {
 
-    @Autowired
     private final JwtTokenUtil jwtTokenUtil;
 
-    @Lazy
-    @Autowired
     private final AuthService authService;
+
+    public JwtAuthenticationFilter(JwtTokenUtil jwtTokenUtil, AuthService authService) {
+        this.jwtTokenUtil = jwtTokenUtil;
+        this.authService = authService;
+    }
 
     @Override
     protected void doFilterInternal(
