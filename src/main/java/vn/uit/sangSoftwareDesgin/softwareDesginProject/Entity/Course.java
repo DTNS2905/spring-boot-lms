@@ -46,9 +46,8 @@ public class Course {
     @Column(precision = 10, scale = 2) // Ensure proper storage of price
     private BigDecimal price;
 
-    @ManyToMany(mappedBy = "courses")
-    @JsonIgnore
-    private Set<User> users = new HashSet<>();
+    @OneToMany(mappedBy = "course", cascade = CascadeType.ALL, orphanRemoval = true)
+    private Set<Enrollment> enrollments = new HashSet<>();
 
     @OneToMany(mappedBy = "course", cascade = CascadeType.ALL, orphanRemoval = true)
     private Set<CartCourse> cartCourses = new HashSet<>();

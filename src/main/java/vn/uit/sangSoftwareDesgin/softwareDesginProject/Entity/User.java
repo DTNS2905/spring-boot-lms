@@ -14,6 +14,7 @@ import jakarta.validation.constraints.Pattern;
 import vn.uit.sangSoftwareDesgin.softwareDesginProject.Entity.Enums.Role;
 
 import java.util.Date;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
@@ -52,13 +53,8 @@ public class User {
     @CollectionTable(name = "user_roles", joinColumns = @JoinColumn(name = "user_id"))
     private List<Role> roles; // Store roles as enums
 
-    @ManyToMany
-    @JoinTable(
-            name = "user_courses",
-            joinColumns = @JoinColumn(name = "userId"),
-            inverseJoinColumns = @JoinColumn(name = "courseId")
-    )
-    private Set<Course> courses;
+    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
+    private Set<Enrollment> enrollments = new HashSet<>();
 
     @OneToOne(cascade = CascadeType.ALL)
     @JoinColumn(name = "profile_id", referencedColumnName = "id")
