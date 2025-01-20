@@ -29,11 +29,8 @@ public class CartCourse {
     @JoinColumn(name = "course_id", nullable = false)
     private Course course;
 
-    @Min(value = 0, message = "Quantity cannot be negative")
+    @Min(value = 1, message = "Quantity must be at least 1")
     private int quantity;
-
-    @Column(precision = 10, scale = 2)
-    private BigDecimal total;
 
 
     // Getters and setters

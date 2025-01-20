@@ -7,11 +7,6 @@ import java.util.List;
 
 public interface UserService {
     /**
-     * Retrieve all users as DTOs with pagination
-     *
-     * @return List of UserDTO
-     */
-    /**
      * Retrieve all users as DTOs with pagination.
      *
      * @param page the page number (zero-based).

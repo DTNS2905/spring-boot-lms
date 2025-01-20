@@ -7,7 +7,7 @@ import org.springframework.data.domain.Page;
 import vn.uit.sangSoftwareDesgin.softwareDesginProject.DTO.UserDTO;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
-import vn.uit.sangSoftwareDesgin.softwareDesginProject.ResponseInstance.ApiResponse;
+import vn.uit.sangSoftwareDesgin.softwareDesginProject.PaginationResponse.ApiResponse;
 import vn.uit.sangSoftwareDesgin.softwareDesginProject.Service.LogService;
 import vn.uit.sangSoftwareDesgin.softwareDesginProject.Service.UserService;
 

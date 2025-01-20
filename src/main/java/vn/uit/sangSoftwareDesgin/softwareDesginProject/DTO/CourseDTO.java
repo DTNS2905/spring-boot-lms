@@ -11,6 +11,7 @@ import java.time.LocalDate;
 public class CourseDTO {
 
     private String courseName;
+    private String type;
     private String title;
     private String description;
     private LocalDate beginDate;

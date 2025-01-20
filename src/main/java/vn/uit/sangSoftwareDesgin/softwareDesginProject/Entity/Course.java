@@ -34,6 +34,7 @@ public class Course {
     private String type;
 
     @Lob // For potentially large descriptions
+    @Column(columnDefinition = "TEXT")
     private String description;
 
     @Column(name= "begin_date",nullable = false) // Make courseName mandatory
@@ -46,13 +47,10 @@ public class Course {
     @Column(precision = 10, scale = 2) // Ensure proper storage of price
     private BigDecimal price;
 
-    @OneToMany(mappedBy = "course", cascade = CascadeType.ALL, orphanRemoval = true)
+    @OneToMany(mappedBy = "course", cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.LAZY)
     private Set<Enrollment> enrollments = new HashSet<>();
 
-    @OneToMany(mappedBy = "course", cascade = CascadeType.ALL, orphanRemoval = true)
-    private Set<CartCourse> cartCourses = new HashSet<>();
-
-    @OneToMany(mappedBy = "course", cascade = CascadeType.ALL, orphanRemoval = true)
+    @OneToMany(mappedBy = "course", cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.LAZY)
     private Set<Lesson> lessons = new HashSet<>();
 
 }

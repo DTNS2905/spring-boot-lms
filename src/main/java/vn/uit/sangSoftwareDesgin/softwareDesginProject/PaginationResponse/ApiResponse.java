@@ -1,4 +1,4 @@
-package vn.uit.sangSoftwareDesgin.softwareDesginProject.ResponseInstance;
+package vn.uit.sangSoftwareDesgin.softwareDesginProject.PaginationResponse;
 
 import lombok.Getter;
 import lombok.Setter;
@@ -9,6 +9,10 @@ public class ApiResponse<T> {
     private String status;
     private String message;
     private T data;
+    // Method to get pagination as a convenience
+    // Method to attach pagination dynamically
+    @Getter
+    @Setter
     private Pagination pagination; // Nullable by default
 
     // Constructor with pagination
@@ -33,7 +37,7 @@ public class ApiResponse<T> {
         return new ApiResponse<>("success", message, data, pagination);
     }
 
-    // Static  method for error response
+    // Static method for error response
     public static <T> ApiResponse<T> error(String message, T data) {
         return new ApiResponse<>("error", message, data);
     }
@@ -57,6 +61,22 @@ public class ApiResponse<T> {
             this.totalElements = totalElements;
             this.totalPages = totalPages;
             this.isLastPage = isLastPage;
+        }
+
+
+        public static Pagination of(int pageNumber, int pageSize, long totalElements) {
+            int totalPages = (int) Math.ceil((double) totalElements / pageSize);
+            boolean isLastPage = pageNumber == totalPages - 1;
+
+            return new Pagination(pageNumber, pageSize, totalElements, totalPages, isLastPage);
+        }
+
+        @Override
+        public String toString() {
+            return String.format(
+                    "Pagination [pageNumber=%d, pageSize=%d, totalElements=%d, totalPages=%d, isLastPage=%b]",
+                    pageNumber, pageSize, totalElements, totalPages, isLastPage
+            );
         }
     }
 }

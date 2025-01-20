@@ -2,7 +2,9 @@ package vn.uit.sangSoftwareDesgin.softwareDesginProject.ServiceImpl;
 
 import org.springframework.data.domain.PageRequest;
 import vn.uit.sangSoftwareDesgin.softwareDesginProject.DTO.UserDTO;
-import vn.uit.sangSoftwareDesgin.softwareDesginProject.ExceptionHandler.UserNotFoundException;
+import vn.uit.sangSoftwareDesgin.softwareDesginProject.Entity.Enrollment;
+import vn.uit.sangSoftwareDesgin.softwareDesginProject.Exception.CourseNotFoundException;
+import vn.uit.sangSoftwareDesgin.softwareDesginProject.Exception.UserNotFoundException;
 import vn.uit.sangSoftwareDesgin.softwareDesginProject.Entity.Course;
 import vn.uit.sangSoftwareDesgin.softwareDesginProject.Entity.User;
 import org.modelmapper.ModelMapper;
@@ -13,7 +15,6 @@ import vn.uit.sangSoftwareDesgin.softwareDesginProject.Repo.CourseRepo;
 import vn.uit.sangSoftwareDesgin.softwareDesginProject.Repo.UserRepo;
 import vn.uit.sangSoftwareDesgin.softwareDesginProject.Service.UserService;
 
-import java.util.HashSet;
 import java.util.List;
 import java.util.Optional;
 import java.util.Set;
@@ -74,13 +75,28 @@ public class UserServiceImpl implements UserService {
         User user = userRepository.findById(userId)
                 .orElseThrow(() -> new UserNotFoundException("User not found with id: " + userId));
 
-        Set<Course> courses = new HashSet<>(courseRepository.findAllById(courseIds));
-        user.setCourses(courses);
+        List<Course> courses = courseRepository.findAllById(courseIds);
+        if (courses.size() != courseIds.size()) {
+            throw new CourseNotFoundException("Some courses were not found for the provided IDs.");
+        }
+
+        Set<Enrollment> enrollments = courses.stream()
+                .map(course -> {
+                    Enrollment enrollment = new Enrollment();
+                    enrollment.setUser(user);
+                    enrollment.setCourse(course);
+                    return enrollment;
+                })
+                .collect(Collectors.toSet());
+
+        user.getEnrollments().clear(); // Remove previous enrollments if needed
+        user.getEnrollments().addAll(enrollments);
 
         User updatedUser = userRepository.save(user);
 
         return modelMapper.map(updatedUser, UserDTO.class);
     }
+
 
 
 
