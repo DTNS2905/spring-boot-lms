@@ -20,9 +20,4 @@ COPY --from=build /app/target/*.jar app.jar
 
 EXPOSE 8080
 
-# Default environment variables (override at runtime if needed)
-ENV DATABASE_URL=jdbc:postgresql://localhost:5432/postgres
-ENV DB_USERNAME=sangdoan
-ENV DB_PASSWORD=sangdoan
-
 CMD ["java", "-jar", "app.jar"]
