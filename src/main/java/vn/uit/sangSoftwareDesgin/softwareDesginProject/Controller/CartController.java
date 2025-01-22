@@ -47,7 +47,7 @@ public class CartController {
         List<Course> removedCourses = cartService.removeCoursesFromCart(username, courseItemDTO);
 
         ApiResponse<List<Course>> response = ApiResponse.success(
-                "Courses added to user cart successfully",
+                "Courses removed from user cart successfully",
                 removedCourses
         );
         return ResponseEntity.ok(response);

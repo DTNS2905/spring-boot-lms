@@ -1,7 +1,5 @@
 package vn.uit.sangSoftwareDesgin.softwareDesginProject.Controller;
 
-import com.stripe.model.checkout.Session;
-import com.stripe.param.checkout.SessionCreateParams;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -13,8 +11,8 @@ import vn.uit.sangSoftwareDesgin.softwareDesginProject.DTO.CheckoutRequest;
 import vn.uit.sangSoftwareDesgin.softwareDesginProject.Entity.Course;
 import vn.uit.sangSoftwareDesgin.softwareDesginProject.Service.CartService;
 import vn.uit.sangSoftwareDesgin.softwareDesginProject.Service.PurchaseService;
+import vn.uit.sangSoftwareDesgin.softwareDesginProject.Service.StripeCheckoutService;
 
-import java.math.BigDecimal;
 import java.util.List;
 import java.util.Map;
 
@@ -28,54 +26,46 @@ public class CheckoutController {
     @Autowired
     private CartService cartService;
 
+    @Autowired
+    private StripeCheckoutService stripeCheckoutService;
+
+    /**
+     * Create a Stripe checkout session for all courses in the cart.
+     */
     @PostMapping("/stripe/check-out-session")
-    public ResponseEntity<?> createCheckoutSessionForAll(@RequestBody CheckoutRequest checkoutRequest) {
+    public ResponseEntity<?> createCheckoutSession(@RequestBody CheckoutRequest checkoutRequest) {
         try {
-            // Check if the course has already been purchased
-            if (purchaseService.hasUserPurchasedCourse(checkoutRequest.getUsername(), checkoutRequest.getCourseId())) {
+            // Step 1: Check if courses have already been purchased
+            List<Long> alreadyPurchasedCourses = purchaseService.getAlreadyPurchasedCourses(
+                    checkoutRequest.getUsername(),
+                    checkoutRequest.getCourseIds()
+            );
+
+            if (!alreadyPurchasedCourses.isEmpty()) {
                 return ResponseEntity.status(HttpStatus.BAD_REQUEST)
-                        .body(Map.of("error", "You have already purchased this course."));
+                        .body(Map.of(
+                                "error", "Some courses have already been purchased.",
+                                "purchasedCourses", alreadyPurchasedCourses
+                        ));
             }
 
-            // Fetch course details from the cart
-            List<Course> cartItems = cartService.getAllCoursesInCart(checkoutRequest.getUsername());
+            // Step 2: Fetch courses from the cart after filtering
+            List<Course> cartItems = cartService.getCoursesByIdsInCart(
+                    checkoutRequest.getUsername(),
+                    checkoutRequest.getCourseIds()
+            );
             if (cartItems == null || cartItems.isEmpty()) {
                 return ResponseEntity.status(HttpStatus.NOT_FOUND)
                         .body(Map.of("error", "No courses found in the cart."));
             }
 
-            // Create Stripe session
-            SessionCreateParams.Builder sessionBuilder = SessionCreateParams.builder()
-                    .setMode(SessionCreateParams.Mode.PAYMENT)
-                    .setSuccessUrl("https://yourdomain.com/success")
-                    .setCancelUrl("https://yourdomain.com/cancel");
-
-            // Add each course in the cart as a line item
-            for (Course course : cartItems) {
-                sessionBuilder.addLineItem(
-                        SessionCreateParams.LineItem.builder()
-                                .setQuantity(1L) // Assuming each course is bought only once
-                                .setPriceData(
-                                        SessionCreateParams.LineItem.PriceData.builder()
-                                                .setCurrency("usd")
-                                                .setUnitAmount(course.getPrice().multiply(BigDecimal.valueOf(100)).longValue()) // Stripe uses cents
-                                                .setProductData(
-                                                        SessionCreateParams.LineItem.PriceData.ProductData.builder()
-                                                                .setName(course.getTitle())
-                                                                .build())
-                                                .build())
-                                .build());
-            }
-
-            // Build the session
-            SessionCreateParams params = sessionBuilder.build();
-            Session session = Session.create(params);
-
-            // Return the session URL as a response
-            return ResponseEntity.ok(Map.of("successUrl", session.getSuccessUrl()));
+            // Step 3: Create Stripe checkout session
+            String sessionUrl = stripeCheckoutService.createCheckoutSession(
+                    cartItems,
+                    String.valueOf(checkoutRequest.getCurrency()));
+            return ResponseEntity.ok(Map.of("checkoutUrl", sessionUrl));
 
         } catch (Exception e) {
-            // Handle unexpected errors
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
                     .body(Map.of("error", "Failed to create checkout session.", "details", e.getMessage()));
         }

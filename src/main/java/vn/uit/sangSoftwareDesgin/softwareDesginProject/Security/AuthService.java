@@ -43,7 +43,7 @@ public class AuthService implements UserDetailsService {
 
     @Override
     public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
-        Optional<User> userDetail = userRepo.findByUsername(username); // Assuming 'email' is used as username
+        Optional<User> userDetail = userRepo.findByUsername(username);
 
         // Converting UserInfo to UserDetails
         return userDetail.map(UserInfoDetails::new)

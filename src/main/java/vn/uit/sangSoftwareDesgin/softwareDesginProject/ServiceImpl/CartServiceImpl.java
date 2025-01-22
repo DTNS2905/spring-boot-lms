@@ -160,6 +160,8 @@ public class CartServiceImpl implements CartService {
 
                 cart.getCartCourses().add(cartItem);
                 addedCourses.add(course);
+            } else {
+                throw new RuntimeException("Course already added to the cart.");
             }
         }
 
@@ -199,12 +201,35 @@ public class CartServiceImpl implements CartService {
                 cart.getCartCourses().remove(cartItem);
                 removedCourses.add(course);
             }
+            else {
+                throw new CourseNotFoundException("can not delete course with ID: " + courseId);
+            }
         }
 
         cartRepository.save(cart); // Save the updated cart
         return removedCourses;
     }
 
+
+    /**
+     * Fetches courses from the user's cart by specific IDs.
+     */
+    public List<Course> getCoursesByIdsInCart(String username, List<Long> courseIds) {
+        // Fetch the cart for the user
+        User user = userRepository.findByUsername(username)
+                .orElseThrow(() -> new UserNotFoundException("User not found with username: " + username));
+
+        Cart cart = user.getCart();
+        if (cart == null || cart.getCartCourses().isEmpty()) {
+            throw new CartNotFoundException("No items found in the cart for user: " + username);
+        }
+
+        // Filter courses in the cart by the specified IDs
+        return cart.getCartCourses().stream()
+                .map(CartCourse::getCourse)
+                .filter(course -> courseIds.contains(course.getId()))
+                .toList();
+    }
 
 
 

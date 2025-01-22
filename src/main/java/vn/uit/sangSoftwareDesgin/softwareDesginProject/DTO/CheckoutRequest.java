@@ -4,16 +4,18 @@ import lombok.Data;
 import lombok.Getter;
 import lombok.Setter;
 
+import java.util.List;
+
 @Data
 @Getter
 @Setter
 public class CheckoutRequest {
 
     public enum Currency {
-        EUR, USD, VND;
+        VND, EUR, USD;
     }
     private String username;
-    private String courseId;
+    private List<Long> courseIds;
     private String description; // Description of the payment
     private Currency currency;  // Currency for the payment (USD, EUR)
 }

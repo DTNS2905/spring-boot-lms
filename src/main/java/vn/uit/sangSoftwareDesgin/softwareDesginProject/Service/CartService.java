@@ -14,5 +14,6 @@ public interface CartService {
     List<Course> getAllCoursesInCart(String username);
     List<Course> addCoursesToCart(String username, CourseItemDTO courseItemDTO);
     List<Course> removeCoursesFromCart(String username, CourseItemDTO courseItemDTO);
+    List<Course> getCoursesByIdsInCart(String username, List<Long> courseIds);
 
 }
