@@ -34,7 +34,6 @@ public class Course {
     private String type;
 
     @Lob // For potentially large descriptions
-    @Column(columnDefinition = "TEXT")
     private String description;
 
     @Column(name= "begin_date",nullable = false) // Make courseName mandatory

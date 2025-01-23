@@ -1,6 +1,8 @@
 package vn.uit.sangSoftwareDesgin.softwareDesginProject.ServiceImpl;
 
 import org.modelmapper.ModelMapper;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -24,6 +26,7 @@ import java.util.stream.Collectors;
 @Service
 public class CartServiceImpl implements CartService {
 
+    private static final Logger log = LoggerFactory.getLogger(CartServiceImpl.class);
     @Autowired
     private UserRepo userRepository;
 
@@ -214,21 +217,31 @@ public class CartServiceImpl implements CartService {
     /**
      * Fetches courses from the user's cart by specific IDs.
      */
+    @Transactional
+    @Override
     public List<Course> getCoursesByIdsInCart(String username, List<Long> courseIds) {
-        // Fetch the cart for the user
-        User user = userRepository.findByUsername(username)
-                .orElseThrow(() -> new UserNotFoundException("User not found with username: " + username));
+        List<Course> courses = null;
+        try {
+            // Fetch the cart for the user
+            User user = userRepository.findByUsername(username)
+                    .orElseThrow(() -> new UserNotFoundException("User not found with username: " + username));
 
-        Cart cart = user.getCart();
-        if (cart == null || cart.getCartCourses().isEmpty()) {
-            throw new CartNotFoundException("No items found in the cart for user: " + username);
+            Cart cart = user.getCart();
+            if (cart == null || cart.getCartCourses().isEmpty()) {
+                throw new CartNotFoundException("No items found in the cart for user: " + username);
+            }
+
+            // Filter courses in the cart by the specified IDs
+            courses = cart.getCartCourses().stream()
+                    .map(CartCourse::getCourse)
+                    .filter(course -> courseIds.contains(course.getId()))
+                    .toList();
+
+        } catch (Exception e) {
+            log.error("getCoursesByIdsInCart{}", e.getMessage());
         }
 
-        // Filter courses in the cart by the specified IDs
-        return cart.getCartCourses().stream()
-                .map(CartCourse::getCourse)
-                .filter(course -> courseIds.contains(course.getId()))
-                .toList();
+        return courses;
     }
 
 
