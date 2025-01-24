@@ -9,4 +9,6 @@ import java.util.UUID;
 @Repository
 public interface ImageRepo extends JpaRepository<Image, UUID> {
 
+    
+
 }

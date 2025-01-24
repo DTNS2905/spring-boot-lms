@@ -1,4 +1,4 @@
-package vn.uit.sangSoftwareDesgin.softwareDesginProject.PaginationResponse;
+package vn.uit.sangSoftwareDesgin.softwareDesginProject.Pagination;
 
 import lombok.Getter;
 import lombok.Setter;

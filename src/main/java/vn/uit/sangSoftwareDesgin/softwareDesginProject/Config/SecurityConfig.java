@@ -38,8 +38,6 @@ public class SecurityConfig {
     private final JwtAuthenticationFilter authFilter;
     private final AuthService authService;
 
-
-    // Constructor Injection for Dependencies
     public SecurityConfig(RoleBasedAccessRules roleBasedAccessRules, JwtAuthenticationFilter authFilter, AuthService authService) {
         this.roleBasedAccessRules = roleBasedAccessRules;
         this.authFilter = authFilter;

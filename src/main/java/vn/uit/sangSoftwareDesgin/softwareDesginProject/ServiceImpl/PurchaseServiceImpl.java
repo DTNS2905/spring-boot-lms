@@ -3,19 +3,23 @@ package vn.uit.sangSoftwareDesgin.softwareDesginProject.ServiceImpl;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import vn.uit.sangSoftwareDesgin.softwareDesginProject.Entity.HistoryPurchase;
+import vn.uit.sangSoftwareDesgin.softwareDesginProject.Entity.*;
+import vn.uit.sangSoftwareDesgin.softwareDesginProject.Repo.CartRepo;
+import vn.uit.sangSoftwareDesgin.softwareDesginProject.Repo.CourseRepo;
 import vn.uit.sangSoftwareDesgin.softwareDesginProject.Repo.HistoryPurchaseRepo;
+import vn.uit.sangSoftwareDesgin.softwareDesginProject.Repo.UserRepo;
 import vn.uit.sangSoftwareDesgin.softwareDesginProject.Service.PurchaseService;
 
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 @Transactional
 @Service
 public class PurchaseServiceImpl implements PurchaseService {
     @Autowired
     private HistoryPurchaseRepo historyPurchaseRepository;
+
+    @Autowired
+    private CourseRepo courseRepository;
 
     /**
      * Checks if the user has already purchased any course in the provided list.
@@ -49,6 +53,25 @@ public class PurchaseServiceImpl implements PurchaseService {
                 .distinct()
                 .toList();
     }
+
+
+    @Transactional
+    @Override
+    public void moveItemsToHistory(List<Long> courseIds) {
+        // Loop through each course ID and move it to the HistoryPurchase table
+        for (Long courseId : courseIds) {
+            // Fetch the course from the database
+            Course course = courseRepository.findById(courseId)
+                    .orElseThrow(() -> new RuntimeException("Course not found with ID: " + courseId));
+
+            // Create and save the HistoryPurchase object
+            HistoryPurchase historyPurchase = new HistoryPurchase();
+            historyPurchase.setCourse(course);
+            historyPurchase.setCheckoutAt(new Date());
+            historyPurchaseRepository.save(historyPurchase);
+        }
+    }
+
 
 
 }

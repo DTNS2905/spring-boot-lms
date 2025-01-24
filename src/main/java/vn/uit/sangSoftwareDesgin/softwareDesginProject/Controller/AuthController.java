@@ -12,7 +12,7 @@ import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.web.bind.annotation.*;
 import vn.uit.sangSoftwareDesgin.softwareDesginProject.DTO.*;
 import vn.uit.sangSoftwareDesgin.softwareDesginProject.Entity.Enums.TokenType;
-import vn.uit.sangSoftwareDesgin.softwareDesginProject.PaginationResponse.ApiResponse;
+import vn.uit.sangSoftwareDesgin.softwareDesginProject.Pagination.ApiResponse;
 import vn.uit.sangSoftwareDesgin.softwareDesginProject.Security.AuthService;
 import vn.uit.sangSoftwareDesgin.softwareDesginProject.Util.JwtTokenUtil;
 

@@ -12,6 +12,7 @@ import vn.uit.sangSoftwareDesgin.softwareDesginProject.Service.LogService;
 
 import java.util.HashMap;
 import java.util.Map;
+import java.util.UUID;
 
 @Service
 public class ImageServiceImpl implements ImageService {
@@ -66,4 +67,43 @@ public class ImageServiceImpl implements ImageService {
             return ResponseEntity.status(500).body(response);
         }
     }
+
+    @Override
+    public String getImageUrl(String imageId) {
+        try {
+            // Fetch the image from the database using its UUID
+            Image image = imageRepository.findById(UUID.fromString(imageId))
+                    .orElseThrow(() -> new RuntimeException("Image not found with ID: " + imageId));
+
+            logService.info("Successfully retrieved image URL for ID: " + imageId);
+            return image.getUrl();
+        } catch (Exception e) {
+            logService.error("Failed to retrieve image with ID: " + imageId, e);
+            throw new RuntimeException("Failed to retrieve image. Error: " + e.getMessage(), e);
+        }
+    }
+
+    @Override
+    public ResponseEntity<Map<String, String>> getImageDetails(String imageId) {
+        Map<String, String> response = new HashMap<>();
+        try {
+            // Fetch image from the database
+            Image image = imageRepository.findById(UUID.fromString(imageId))
+                    .orElseThrow(() -> new RuntimeException("Image not found with ID: " + imageId));
+
+            // Prepare response with image details
+            response.put("id", image.getId().toString());
+            response.put("name", image.getName());
+            response.put("url", image.getUrl());
+            logService.info("Image details retrieved successfully for ID: " + imageId);
+
+            return ResponseEntity.ok(response);
+
+        } catch (Exception e) {
+            logService.error("Failed to retrieve image details for ID: " + imageId, e);
+            response.put("error", "Failed to retrieve image details. Error: " + e.getMessage());
+            return ResponseEntity.status(404).body(response);
+        }
+    }
 }
+

@@ -17,10 +17,7 @@ import vn.uit.sangSoftwareDesgin.softwareDesginProject.Repo.UserRepo;
 import vn.uit.sangSoftwareDesgin.softwareDesginProject.Service.CartService;
 
 import java.math.BigDecimal;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.stream.Collectors;
 
 @Service
@@ -35,8 +32,9 @@ public class CartServiceImpl implements CartService {
 
     @Autowired
     private CourseRepo courseRepository;
+
     @Autowired
-    private ModelMapper modelMapper;
+    private UserRepo userRepo;
 
     /**
      * Fetches all cart items for a given user and calculates total quantity and price.
@@ -244,6 +242,22 @@ public class CartServiceImpl implements CartService {
         return courses;
     }
 
+    @Override
+    @Transactional
+    public void clearCart(String username, List<Long> paidCourseIds) {
+        Optional<User> user = userRepo.findByUsername(username);
+        if (user.isEmpty()) {
+            throw new RuntimeException("User not found");
+        }
+        // Get the user's cart
+        Cart cart = user.get().getCart();
 
+        // Filter out only the items that match the paid course IDs
+        cart.getCartCourses().removeIf(cartCourse ->
+                paidCourseIds.contains(cartCourse.getCourse().getId())
+        );
 
+        // Save the updated cart
+        cartRepository.save(cart);
+    }
 }

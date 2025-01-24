@@ -9,7 +9,7 @@ import vn.uit.sangSoftwareDesgin.softwareDesginProject.DTO.ProfileCreateDTO;
 import vn.uit.sangSoftwareDesgin.softwareDesginProject.DTO.ProfileResponseDTO;
 import vn.uit.sangSoftwareDesgin.softwareDesginProject.DTO.ProfileUpdateDTO;
 import vn.uit.sangSoftwareDesgin.softwareDesginProject.Entity.Profile;
-import vn.uit.sangSoftwareDesgin.softwareDesginProject.PaginationResponse.ApiResponse;
+import vn.uit.sangSoftwareDesgin.softwareDesginProject.Pagination.ApiResponse;
 import vn.uit.sangSoftwareDesgin.softwareDesginProject.Service.LogService;
 import vn.uit.sangSoftwareDesgin.softwareDesginProject.Service.ProfileService;
 

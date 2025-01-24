@@ -8,6 +8,6 @@ import java.util.List;
 
 
 public interface StripeCheckoutService {
-    String createCheckoutSession(List<Course> cartItems, String currency) throws StripeException;
+    String createCheckoutSession(List<Course> cartItems, String currency, String username) throws StripeException;
 
 }

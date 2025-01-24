@@ -14,7 +14,7 @@ public class CheckoutRequest {
     public enum Currency {
         VND, EUR, USD;
     }
-    private String username;
+
     private List<Long> courseIds;
     private String description; // Description of the payment
     private Currency currency;  // Currency for the payment (USD, EUR)

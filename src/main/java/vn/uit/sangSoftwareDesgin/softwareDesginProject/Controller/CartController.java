@@ -5,7 +5,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import vn.uit.sangSoftwareDesgin.softwareDesginProject.DTO.CourseItemDTO;
 import vn.uit.sangSoftwareDesgin.softwareDesginProject.Entity.Course;
-import vn.uit.sangSoftwareDesgin.softwareDesginProject.PaginationResponse.ApiResponse;
+import vn.uit.sangSoftwareDesgin.softwareDesginProject.Pagination.ApiResponse;
 import vn.uit.sangSoftwareDesgin.softwareDesginProject.Service.CartService;
 
 import java.util.List;

@@ -2,6 +2,8 @@ package vn.uit.sangSoftwareDesgin.softwareDesginProject.ServiceImpl;
 
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import vn.uit.sangSoftwareDesgin.softwareDesginProject.DTO.CourseDTO;
 import vn.uit.sangSoftwareDesgin.softwareDesginProject.Entity.Course;
@@ -20,12 +22,13 @@ public class CourseServiceImpl implements CourseService {
     private ModelMapper modelMapper;
 
     @Override
-    public List<CourseDTO> getAllCourses() {
-        List<Course> courses = courseRepository.findAll();
-        return courses.stream()
-                .map(course -> modelMapper.map(course, CourseDTO.class))
-                .collect(Collectors.toList());
+    public Page<CourseDTO> getAllCourses(Pageable pageable) {
+        Page<Course> coursePage = courseRepository.findAll(pageable);
+
+        // Map Course entities to CourseDTOs
+        return coursePage.map(course -> modelMapper.map(course, CourseDTO.class));
     }
+
 
     @Override
     public CourseDTO getCourseById(Long id) {
