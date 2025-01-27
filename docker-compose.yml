@@ -7,9 +7,9 @@ services:
     ports:
       - "8080:8080"
     environment:
-      DATABASE_URL: jdbc:postgresql://host.docker.internal:5432/postgres
-      DB_USERNAME: sangdoan
-      DB_PASSWORD: sangdoan
+      DATABASE_URL: jdbc:postgresql://host.docker.internal:5433/postgres
+      DB_USERNAME: sang
+      DB_PASSWORD: sang
       CLOUDINARY_CLOUD_NAME: dlewcpecf
       CLOUDINARY_API_KEY: 145472219587411
       CLOUDINARY_API_SECRET: uf1lNLjrMHGmvGXL3Vq-6y8A3hE
@@ -17,3 +17,5 @@ services:
       JPA_SHOW_SQL: "true"
       HIBERNATE_DDL_AUTO: update
       STRIPE_SECRET_KEY: sk_test_51QjKW6CcATEgLgKlcPzpkmxoKEZhSMtEBChF7y9YuMnm0QZiTtnXIxDoEkuKQzTalcHVRWo9ghpyGeebagp2yVla00NaiL3Tx2
+      STRIPE_WEBHOOK_SECRET: whsec_7b59eaf01311d3a28b30d3d8b14b5313bf655d6643963aa496c1bbd29838fd21
+      FRONTEND_URL: http://localhost:5173
