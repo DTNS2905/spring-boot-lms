@@ -10,6 +10,7 @@ import java.time.LocalDate;
 @Getter
 public class CourseDTO {
 
+    private Long id;
     private String courseName;
     private String type;
     private String title;

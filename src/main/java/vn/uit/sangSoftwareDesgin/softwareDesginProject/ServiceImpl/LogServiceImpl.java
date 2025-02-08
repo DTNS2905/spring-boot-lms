@@ -24,4 +24,8 @@ public class LogServiceImpl implements LogService {
     public void error(String message, Throwable throwable) {
         logger.error(message, throwable);
     }
+    @Override
+    public void error(String message) {
+        logger.error(message);
+    }
 }

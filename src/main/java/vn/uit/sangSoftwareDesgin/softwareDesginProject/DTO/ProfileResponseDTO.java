@@ -7,6 +7,8 @@ import lombok.Setter;
 @Setter
 public class ProfileResponseDTO {
 
+    private Long id;
+
     private String firstName;
 
     private String lastName;
