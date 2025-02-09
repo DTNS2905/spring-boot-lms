@@ -8,6 +8,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import vn.uit.sangSoftwareDesgin.softwareDesginProject.DTO.ImageCourseDTO;
 import vn.uit.sangSoftwareDesgin.softwareDesginProject.DTO.ImageResponseDTO;
 import vn.uit.sangSoftwareDesgin.softwareDesginProject.Entity.*;
@@ -17,10 +18,12 @@ import vn.uit.sangSoftwareDesgin.softwareDesginProject.Service.CloudinaryService
 import vn.uit.sangSoftwareDesgin.softwareDesginProject.Service.ImageService;
 import vn.uit.sangSoftwareDesgin.softwareDesginProject.Service.LogService;
 
+import java.lang.reflect.Method;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.UUID;
+import java.util.function.Function;
 import java.util.stream.Collectors;
 
 @Service
@@ -56,37 +59,32 @@ public class ImageServiceImpl implements ImageService {
 
 
     @Override
-    public ImageResponseDTO uploadImage(ImageCourseDTO imageModel) {
+    @Transactional
+    public ImageResponseDTO uploadAndAssociateImage(ImageCourseDTO imageRequest) {
         try {
-            // Validate input
-            if (imageModel == null || imageModel.getFile() == null || imageModel.getFile().isEmpty()) {
-                logService.warn("Image upload failed: File is empty or not provided.");
-                throw new IllegalArgumentException("Image file is required.");
-            }
-            if (imageModel.getImageName() == null || imageModel.getImageName().isEmpty()) {
-                logService.warn("Image upload failed: Name is empty or not provided.");
-                throw new IllegalArgumentException("Image name is required.");
-            }
-
-            // Upload file to Cloudinary
-            String uploadedUrl = cloudinaryService.uploadFile(imageModel.getFile(), "spring_boot_lms");
+            // Step 1: Upload image
+            String uploadedUrl = cloudinaryService.uploadFile(imageRequest.getFile(), "spring_boot_lms");
             if (uploadedUrl == null) {
-                logService.error("Image upload to Cloudinary failed: Returned URL is null.");
                 throw new RuntimeException("Failed to upload image to Cloudinary.");
             }
 
-            // Save to database
+            // Step 2: Save image in the database
             Image image = new Image();
-            image.setName(imageModel.getImageName());
+            image.setName(imageRequest.getImageName());
             image.setUrl(uploadedUrl);
             imageRepository.save(image);
 
-            logService.info("Image uploaded successfully. URL: " + uploadedUrl);
+            // Step 3: Associate image (Rollback occurs here if it fails)
+            associateImage(imageRequest, image.getId());
+
+            logService.info("Image uploaded and associated successfully. URL: " + uploadedUrl);
+
+            // Step 4: Return response DTO
             return modelMapper.map(image, ImageResponseDTO.class);
 
         } catch (Exception e) {
-            logService.error("Unexpected error during image upload", e);
-            throw new RuntimeException("An unexpected error occurred during image upload.", e);
+            logService.error("Transaction failed. Rolling back upload & association.", e);
+            throw new RuntimeException("Image upload and association failed: " + e.getMessage(), e);
         }
     }
 
@@ -189,6 +187,46 @@ public class ImageServiceImpl implements ImageService {
         } catch (Exception e) {
             logService.error("Failed to retrieve image for course ID: " + courseId, e);
             throw new RuntimeException("Failed to retrieve image. Error: " + e.getMessage(), e);
+        }
+    }
+
+    @Override
+    public <T> List<ImageResponseDTO> getImagesByReferenceId(
+            Long referenceId,
+            Function<Long, List<T>> fetchImagesFunction,
+            String referenceType
+    ) {
+        try {
+            // Fetch images dynamically
+            List<T> imageMappings = fetchImagesFunction.apply(referenceId);
+
+            if (imageMappings.isEmpty()) {
+                throw new RuntimeException("No images found for " + referenceType + " ID: " + referenceId);
+            }
+
+            // Use Reflection to dynamically get the `Image` field
+            return imageMappings.stream()
+                    .map(mapping -> extractImage(mapping))
+                    .collect(Collectors.toList());
+
+        } catch (Exception e) {
+            throw new RuntimeException("Failed to retrieve images for " + referenceType + " ID: " + referenceId, e);
+        }
+    }
+
+    /**
+     * Dynamically extracts the `Image` field from any entity type.
+     */
+    private ImageResponseDTO extractImage(Object mapping) {
+        try {
+            // Use reflection to get the `getImage` method from any entity type
+            Method getImageMethod = mapping.getClass().getMethod("getImage");
+            Image image = (Image) getImageMethod.invoke(mapping);
+
+            // Convert Image entity to DTO
+            return modelMapper.map(image, ImageResponseDTO.class);
+        } catch (Exception e) {
+            throw new RuntimeException("Failed to extract image from entity: " + mapping.getClass().getSimpleName(), e);
         }
     }
 

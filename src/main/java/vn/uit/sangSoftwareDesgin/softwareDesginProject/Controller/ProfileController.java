@@ -77,7 +77,10 @@ public class ProfileController {
             ProfileResponseDTO profileResponse = modelMapper.map(createdProfile, ProfileResponseDTO.class);
 
             // Construct the success response
-            ApiResponse<ProfileResponseDTO> respond = ApiResponse.success("Profile created successfully", null);
+            ApiResponse<ProfileResponseDTO> respond = ApiResponse.success(
+                    "Profile created successfully",
+                    profileResponse
+            );
             return ResponseEntity.ok(respond);
         } catch (Exception e) {
             // Handle any unexpected errors

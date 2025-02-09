@@ -33,10 +33,7 @@ public class ImageController {
             logService.info("Received request to upload an image.");
 
             // Upload image and get response DTO
-            ImageResponseDTO imageResponse = imageService.uploadImage(imageRequest);
-
-            // Associate image with course or profile
-            imageService.associateImage(imageRequest, imageResponse.getId());
+            ImageResponseDTO imageResponse = imageService.uploadAndAssociateImage(imageRequest);
 
             // Success response
             ApiResponse<ImageResponseDTO> response = ApiResponse.success(

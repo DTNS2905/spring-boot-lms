@@ -6,8 +6,10 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import vn.uit.sangSoftwareDesgin.softwareDesginProject.DTO.CourseDTO;
+import vn.uit.sangSoftwareDesgin.softwareDesginProject.DTO.CourseResponseDTO;
 import vn.uit.sangSoftwareDesgin.softwareDesginProject.Entity.Course;
 import vn.uit.sangSoftwareDesgin.softwareDesginProject.Repo.CourseRepo;
+import vn.uit.sangSoftwareDesgin.softwareDesginProject.Repo.UserCourseImageRepo;
 import vn.uit.sangSoftwareDesgin.softwareDesginProject.Service.CourseService;
 
 import java.util.List;
@@ -21,12 +23,24 @@ public class CourseServiceImpl implements CourseService {
     @Autowired
     private ModelMapper modelMapper;
 
+    @Autowired
+    private UserCourseImageRepo userCourseImageRepository;
+
     @Override
-    public Page<CourseDTO> getAllCourses(Pageable pageable) {
+    public Page<CourseResponseDTO> getAllCourses(Pageable pageable) {
         Page<Course> coursePage = courseRepository.findAll(pageable);
 
-        // Map Course entities to CourseDTOs
-        return coursePage.map(course -> modelMapper.map(course, CourseDTO.class));
+        return coursePage.map(course -> {
+            CourseResponseDTO courseResponse = modelMapper.map(course, CourseResponseDTO.class);
+
+            List<String> imageUrls = userCourseImageRepository.findManyByCourseId(course.getId())
+                    .stream()
+                    .map(uci -> uci.getImage().getUrl())
+                    .collect(Collectors.toList());
+
+            courseResponse.setImageUrls(imageUrls.isEmpty() ? null : imageUrls);
+            return courseResponse;
+        });
     }
 
 

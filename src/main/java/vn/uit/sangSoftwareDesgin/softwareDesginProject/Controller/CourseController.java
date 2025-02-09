@@ -8,6 +8,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import vn.uit.sangSoftwareDesgin.softwareDesginProject.DTO.CourseDTO;
+import vn.uit.sangSoftwareDesgin.softwareDesginProject.DTO.CourseResponseDTO;
 import vn.uit.sangSoftwareDesgin.softwareDesginProject.Pagination.ApiResponse;
 import vn.uit.sangSoftwareDesgin.softwareDesginProject.Service.CourseService;
 
@@ -21,7 +22,8 @@ public class CourseController {
     private CourseService courseService;
 
     // Get all courses
-    public ResponseEntity<ApiResponse<List<CourseDTO>>> getAllCoursesPaginated(
+    @GetMapping("/get-all")
+    public ResponseEntity<ApiResponse<List<CourseResponseDTO>>> getAllCoursesPaginated(
             @RequestParam(defaultValue = "0") int page,
             @RequestParam(defaultValue = "10") int size
     ) {
@@ -29,7 +31,7 @@ public class CourseController {
         Pageable pageable = PageRequest.of(page, size);
 
         // Fetch paginated courses
-        Page<CourseDTO> coursePage = courseService.getAllCourses(pageable);
+        Page<CourseResponseDTO> coursePage = courseService.getAllCourses(pageable);
 
         // Create Pagination metadata
         ApiResponse.Pagination pagination = new ApiResponse.Pagination(
