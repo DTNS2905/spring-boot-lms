@@ -4,6 +4,7 @@ import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Service;
 import vn.uit.sangSoftwareDesgin.softwareDesginProject.DTO.CourseDTO;
 import vn.uit.sangSoftwareDesgin.softwareDesginProject.DTO.CourseResponseDTO;
@@ -51,6 +52,7 @@ public class CourseServiceImpl implements CourseService {
         return modelMapper.map(course, CourseDTO.class);
     }
 
+    @PreAuthorize("hasRole('ROLE_LECTURER')")
     @Override
     public CourseDTO createCourse(CourseDTO courseDTO) {
         Course course = modelMapper.map(courseDTO, Course.class);
@@ -58,6 +60,7 @@ public class CourseServiceImpl implements CourseService {
         return modelMapper.map(savedCourse, CourseDTO.class);
     }
 
+    @PreAuthorize("hasRole('ROLE_LECTURER')")
     @Override
     public CourseDTO updateCourse(Long id, CourseDTO courseDTO) {
         Course existingCourse = courseRepository.findById(id)
@@ -75,6 +78,7 @@ public class CourseServiceImpl implements CourseService {
         return modelMapper.map(updatedCourse, CourseDTO.class);
     }
 
+    @PreAuthorize("hasRole('ROLE_LECTURER')")
     @Override
     public void deleteCourse(Long id) {
         if (!courseRepository.existsById(id)) {

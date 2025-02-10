@@ -8,6 +8,7 @@ import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
@@ -55,10 +56,7 @@ public class AuthService implements UserDetailsService {
             String username = userInfo.getUsername();
             String password = userInfo.getPassword();
             String email = userInfo.getEmail();
-            // Log received user info
-            log.info("Adding new user with username: {}", username);
-            log.info("Adding new user with password: {}", password);
-
+            Boolean isTeacher = userInfo.getIsTeacher();
 
             if (!ValidationUtils.isValidName(username)) {
                 throw new IllegalArgumentException("Username must have string length is between 3 and 20 characters, inclusive and single " +
@@ -78,8 +76,11 @@ public class AuthService implements UserDetailsService {
 
             user.setPassword(encoder.encode(user.getPassword()));
 
-            user.setRoles(List.of(Role.PARTICIPANT)); // Default role for new users
-
+            if(!isTeacher) {
+                user.setRoles(List.of(Role.PARTICIPANT)); // Default role for new users
+            } else {
+                user.setRoles(List.of(Role.LECTURER)); // Default role for new users
+            }
             // Save user to the database
             User savedUser = userRepo.save(user);
 
@@ -108,5 +109,4 @@ public class AuthService implements UserDetailsService {
             throw new IllegalStateException("Authentication failed. Please check your credentials.");
         }
     }
-
 }

@@ -7,6 +7,7 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import vn.uit.sangSoftwareDesgin.softwareDesginProject.DTO.ImageCourseDTO;
@@ -25,6 +26,8 @@ import java.util.Map;
 import java.util.UUID;
 import java.util.function.Function;
 import java.util.stream.Collectors;
+
+import static vn.uit.sangSoftwareDesgin.softwareDesginProject.Entity.Enums.Role.LECTURER;
 
 @Service
 public class ImageServiceImpl implements ImageService {
@@ -89,7 +92,6 @@ public class ImageServiceImpl implements ImageService {
     }
 
     @Override
-    //Decide where to associate the image
     public void associateImage(ImageCourseDTO imageRequest, UUID imageId) {
         if (imageRequest.getCourseId() != null) {
             associateImageWithCourse(imageRequest.getUserName(), imageRequest.getCourseId(), imageId);
@@ -103,6 +105,10 @@ public class ImageServiceImpl implements ImageService {
             // Fetch entities
             User user = userRepository.findByUsername(userName)
                     .orElseThrow(() -> new RuntimeException("User not found with name: " + userName));
+
+            if(!user.getRoles().contains(LECTURER)) {
+                throw new RuntimeException("Access denied for user: " + userName);
+            }
 
             Course course = courseRepository.findById(courseId)
                     .orElseThrow(() -> new RuntimeException("Course not found with ID: " + courseId));

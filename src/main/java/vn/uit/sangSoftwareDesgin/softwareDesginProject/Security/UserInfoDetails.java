@@ -13,10 +13,9 @@ import java.util.stream.Stream;
 
 public class UserInfoDetails implements UserDetails {
 
-    private String username;
-    private String password;
-
-    private List<GrantedAuthority> authorities;
+    private final String username;
+    private final String password;
+    private final List<GrantedAuthority> authorities;
 
     public UserInfoDetails(User userInfo) {
         this.username = userInfo.getUsername();
